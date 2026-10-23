@@ -1,0 +1,73 @@
+{
+  "lieux": [
+    { "id": 1,  "nom": "Dpt R&T Montbéliard",    "adresse": "Rue Engel-Gros",        "ville": "Montbéliard", "type": "universite", "code_postal": "25200", "longitude": 6.79826,  "latitude": 47.50558 },
+    { "id": 2,  "nom": "Stade Bonal (FCSM)",      "adresse": "Route de Besançon",     "ville": "Sochaux",     "type": "loisir",     "code_postal": "25600", "longitude": 6.78900,  "latitude": 47.49420 },
+    { "id": 3,  "nom": "Carrefour Audincourt",    "adresse": "Rue de Seloncourt",     "ville": "Audincourt",  "type": "courses",    "code_postal": "25400", "longitude": 6.84210,  "latitude": 47.48280 },
+    { "id": 4,  "nom": "E.Leclerc Montbéliard",   "adresse": "Rue Jacques Foillet",   "ville": "Montbéliard", "type": "courses",    "code_postal": "25200", "longitude": 6.79340,  "latitude": 47.51820 },
+    { "id": 10, "nom": "Domicile Lucas Martin",  "adresse": "12 rue des Acacias",    "ville": "Montbéliard", "type": "domicile",   "code_postal": "25200", "longitude": 6.80120,  "latitude": 47.51020 },
+    { "id": 11, "nom": "Domicile Emma Bernard",  "adresse": "3 avenue Gambetta",     "ville": "Audincourt",  "type": "domicile",   "code_postal": "25400", "longitude": 6.83710,  "latitude": 47.48990 },
+    { "id": 12, "nom": "Domicile Hugo Petit","adresse": "4 rue des Jardins",      "ville": "Valentigney", "type": "domicile",   "code_postal": "25700", "longitude": 6.83200,  "latitude": 47.47650 },
+    { "id": 13, "nom": "Domicile Léa Durand",  "adresse": "22 rue Victor Hugo",    "ville": "Montbéliard", "type": "domicile",   "code_postal": "25200", "longitude": 6.79500,  "latitude": 47.50200 },
+    { "id": 14, "nom": "Domicile Nathan Moreau", "adresse": "5 impasse des Lilas",   "ville": "Exincourt",   "type": "domicile",   "code_postal": "25400", "longitude": 6.81900,  "latitude": 47.49500 },
+    { "id": 15, "nom": "Domicile Chloé Laurent",     "adresse": "18 rue du Général",     "ville": "Bart",        "type": "domicile",   "code_postal": "25420", "longitude": 6.78400,  "latitude": 47.52100 },
+    { "id": 16, "nom": "Domicile Théo Simon",     "adresse": "9 rue des Fleurs",      "ville": "Sochaux",     "type": "domicile",   "code_postal": "25600", "longitude": 6.79100,  "latitude": 47.49600 }
+  ],
+
+  "etudiants": [
+    { "id": 1, "nom": "Martin", "prenom": "Lucas",   "email": "lucas.martin@ufc",   "password": "butrt", "groupe": "GB1" },
+    { "id": 2, "nom": "Bernard", "prenom": "Emma",   "email": "emma.bernard@ufc",   "password": "butrt", "groupe": "GB1" },
+    { "id": 3, "nom": "Petit", "prenom": "Hugo",   "email": "hugo.petit@ufc", "password": "butrt", "groupe": "GB1" },
+    { "id": 4, "nom": "Durand", "prenom": "Léa", "email": "lea.durand@ufc",   "password": "butrt", "groupe": "LK1" },
+    { "id": 5, "nom": "Moreau", "prenom": "Nathan","email": "nathan.moreau@ufc",  "password": "butrt", "groupe": "GB2" },
+    { "id": 6, "nom": "Laurent", "prenom": "Chloé",   "email": "chloe.laurent@ufc",      "password": "butrt", "groupe": "LK2" },
+    { "id": 7, "nom": "Simon", "prenom": "Théo",   "email": "theo.simon@ufc",      "password": "butrt", "groupe": "GB2" }
+  ],
+
+  "domiciles": [
+    { "type": "principale", "id_etudiant": 1, "id_lieu": 10 },
+    { "type": "principale", "id_etudiant": 2, "id_lieu": 11 },
+    { "type": "principale", "id_etudiant": 3, "id_lieu": 12 },
+    { "type": "principale", "id_etudiant": 4, "id_lieu": 13 },
+    { "type": "principale", "id_etudiant": 5, "id_lieu": 14 },
+    { "type": "principale", "id_etudiant": 6, "id_lieu": 15 },
+    { "type": "principale", "id_etudiant": 7, "id_lieu": 16 }
+  ],
+
+  "vehicules": [
+    { "id": 1, "immatriculation": "AB-123-CD", "nb_places": 5, "id_etudiant": 1, "marque": "Peugeot", "modele": "208", "date_ct": "2026-03-15", "date_assurance": "2026-01-01" },
+    { "id": 2, "immatriculation": "EF-456-GH", "nb_places": 5, "id_etudiant": 2, "marque": "Renault", "modele": "Clio","date_ct": "2025-11-20", "date_assurance": "2026-01-01" },
+    { "id": 3, "immatriculation": "IJ-789-KL", "nb_places": 4, "id_etudiant": 5, "marque": "Citroën", "modele": "C3",  "date_ct": "2026-07-10", "date_assurance": "2026-01-01" }
+  ],
+
+  "horaires": [
+    { "id_etudiant": 1, "jour_semaine": "lundi",    "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 1, "jour_semaine": "mardi",    "heure_debut": "10:00", "heure_fin": "14:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 1, "jour_semaine": "jeudi",    "heure_debut": "08:00", "heure_fin": "18:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 1, "jour_semaine": "vendredi", "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 1, "jour_semaine": "vendredi", "heure_debut": "20:00", "heure_fin": "22:30", "id_lieu": 2, "type": "loisir"  },
+
+    { "id_etudiant": 2, "jour_semaine": "lundi",    "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 2, "jour_semaine": "mardi",    "heure_debut": "10:00", "heure_fin": "14:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 2, "jour_semaine": "mercredi", "heure_debut": "14:00", "heure_fin": "18:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 2, "jour_semaine": "vendredi", "heure_debut": "20:00", "heure_fin": "22:30", "id_lieu": 2, "type": "loisir"  },
+
+    { "id_etudiant": 3, "jour_semaine": "lundi",    "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 3, "jour_semaine": "mercredi", "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 3, "jour_semaine": "jeudi",    "heure_debut": "14:00", "heure_fin": "18:00", "id_lieu": 1, "type": "travail" },
+
+    { "id_etudiant": 4, "jour_semaine": "lundi",    "heure_debut": "08:15", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 4, "jour_semaine": "jeudi",    "heure_debut": "08:00", "heure_fin": "18:00", "id_lieu": 1, "type": "travail" },
+
+    { "id_etudiant": 5, "jour_semaine": "lundi",    "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 5, "jour_semaine": "mardi",    "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 5, "jour_semaine": "vendredi", "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 5, "jour_semaine": "vendredi", "heure_debut": "20:00", "heure_fin": "22:30", "id_lieu": 2, "type": "loisir"  },
+
+    { "id_etudiant": 6, "jour_semaine": "lundi",    "heure_debut": "10:00", "heure_fin": "14:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 6, "jour_semaine": "mercredi", "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+
+    { "id_etudiant": 7, "jour_semaine": "lundi",    "heure_debut": "08:00", "heure_fin": "12:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 7, "jour_semaine": "vendredi", "heure_debut": "14:00", "heure_fin": "18:00", "id_lieu": 1, "type": "travail" },
+    { "id_etudiant": 7, "jour_semaine": "vendredi", "heure_debut": "20:00", "heure_fin": "22:30", "id_lieu": 2, "type": "loisir"  }
+  ]
+}

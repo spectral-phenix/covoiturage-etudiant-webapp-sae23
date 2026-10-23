@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Covoiturage FCSM</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="login-screen">
+  <form id="login-form" class="login-card">
+    <h2>Connexion</h2>
+    <p class="page-sub">Connectez-vous avec un compte étudiant de test.</p>
+    <div class="form-group">
+      <label>Email ou identifiant</label>
+      <input type="text" name="email" placeholder="votre.email@ufc ou admin" required>
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" name="password" value="butrt" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+    <div class="login-hint">Exemple : lucas.martin@ufc / butrt &nbsp;|&nbsp; admin / root</div>
+  </form>
+</div>
+
+<div id="app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div id="sidebar-top">
+      <div id="user-avatar">--</div>
+      <div id="user-name">Non connecté</div>
+      <div id="user-sub">BUT1 R&T</div>
+    </div>
+    <nav>
+      <div class="nav-section">Trajets</div>
+      <div class="nav-item active" data-page="accueil">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 6.5L8 2l6 4.5V14H2V6.5z"/>
+        </svg>
+        Accueil
+      </div>
+      <div class="nav-item" data-page="creer">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/>
+        </svg>
+        Créer une annonce
+      </div>
+      <div class="nav-item" data-page="rejoindre">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 2v12M2 8l6-6 6 6"/>
+        </svg>
+        Rejoindre un trajet
+      </div>
+      <div class="nav-section">Compte</div>
+      <div class="nav-item" data-page="vehicule">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="5" width="14" height="7" rx="2"/><path d="M4 5l2-3h4l2 3"/><circle cx="4.5" cy="12" r="1"/><circle cx="11.5" cy="12" r="1"/>
+        </svg>
+        Véhicule
+      </div>
+      <div class="nav-item" data-page="profil">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+        </svg>
+        Mon profil
+      </div>
+    </nav>
+    <button id="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M10 2h4v12h-4M6 11l-4-3 4-3M2 8h8"/>
+      </svg>
+      Déconnexion
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ACCUEIL -->
+    <div class="page active" id="page-accueil">
+      <h2>Personnes avec qui vous pourriez covoiturer</h2>
+      <p class="page-sub">Étudiants compatibles avec vos horaires et vos trajets en cours</p>
+
+      <div class="section-label">Étudiants compatibles</div>
+      <div id="matches-list"><div class="loading">Chargement...</div></div>
+
+      <div class="divider"></div>
+      <div class="section-label">Mes trajets</div>
+      <div id="mes-trajets-list"><div class="loading">Chargement...</div></div>
+    </div>
+
+    <!-- CRÉER -->
+    <div class="page" id="page-creer">
+      <h2>Créer une annonce</h2>
+      <p class="page-sub">Proposez un trajet aux autres étudiants</p>
+
+      <form id="form-creer">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-lieu-depart">Lieu de départ</label>
+            <select id="f-lieu-depart" name="id_lieu_depart" required></select>
+          </div>
+          <div class="form-group">
+            <label for="f-lieu-arrivee">Lieu d'arrivée</label>
+            <select id="f-lieu-arrivee" name="id_lieu_arrivee" required></select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-date">Date du trajet</label>
+            <input type="date" id="f-date" name="date_trajet" required>
+          </div>
+          <div class="form-group">
+            <label for="f-type">Type</label>
+            <select id="f-type" name="type">
+              <option value="aller">Aller</option>
+              <option value="retour">Retour</option>
+              <option value="aller-retour">Aller-retour</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-heure-dep">Heure de départ</label>
+            <input type="time" id="f-heure-dep" name="heure_depart" required>
+          </div>
+          <div class="form-group">
+            <label for="f-heure-arr">Heure d'arrivée estimée</label>
+            <input type="time" id="f-heure-arr" name="heure_arrivee_estimee">
+          </div>
+        </div>
+
+        <!-- Champs retour — visibles uniquement si type = aller-retour -->
+        <div id="retour-fields" style="display:none;">
+          <div style="height:1px;background:var(--border);margin:4px 0 16px;"></div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-3);margin-bottom:12px;font-weight:500;">Informations du retour</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-retour-dep">Heure de départ (retour)</label>
+              <input type="time" id="f-retour-dep" name="heure_retour_depart">
+            </div>
+            <div class="form-group">
+              <label for="f-retour-arr">Heure d'arrivée estimée (retour)</label>
+              <input type="time" id="f-retour-arr" name="heure_retour_arrivee">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="f-vehicule">Véhicule</label>
+          <select id="f-vehicule" name="id_vehicule"></select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-participation">Participation demandée</label>
+            <input type="text" id="f-participation" name="participation" placeholder="ex : 1€/trajet, libre…">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="f-remarques">Remarques</label>
+          <textarea id="f-remarques" name="remarques" rows="2" placeholder="Informations complémentaires…"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Publier le trajet</button>
+      </form>
+    </div>
+
+    <!-- REJOINDRE -->
+    <div class="page" id="page-rejoindre">
+      <h2>Rejoindre un trajet</h2>
+      <p class="page-sub">Trajets disponibles auxquels vous n'êtes pas encore inscrit</p>
+      <div id="rejoindre-list"><div class="loading">Chargement...</div></div>
+    </div>
+
+    <!-- VÉHICULE -->
+    <div class="page" id="page-vehicule">
+      <h2>Mes véhicules</h2>
+      <p class="page-sub">Gérez les véhicules associés à votre compte</p>
+
+      <div id="vehicules-list"><div class="loading">Chargement...</div></div>
+
+      <div class="divider"></div>
+      <div class="section-label">Ajouter un véhicule</div>
+
+      <form id="form-vehicule">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Marque</label>
+            <input type="text" name="marque" placeholder="ex : Renault">
+          </div>
+          <div class="form-group">
+            <label>Modèle</label>
+            <input type="text" name="modele" placeholder="ex : Clio">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Immatriculation *</label>
+            <input type="text" name="immatriculation" placeholder="AB-123-CD" required>
+          </div>
+          <div class="form-group">
+            <label>Nombre de places *</label>
+            <input type="number" name="nb_places" min="2" max="9" value="5" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Contrôle technique (validité)</label>
+            <input type="date" name="date_ct">
+          </div>
+          <div class="form-group">
+            <label>Assurance (échéance)</label>
+            <input type="date" name="date_assurance">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Enregistrer le véhicule</button>
+      </form>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="page" id="page-profil">
+      <h2>Mon profil</h2>
+      <p class="page-sub">Informations personnelles et universitaires</p>
+
+      <div class="section-label">Informations générales</div>
+      <form id="form-profil">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" id="p-nom" name="nom" required>
+          </div>
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" id="p-prenom" name="prenom" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="p-email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label>Groupe</label>
+            <select id="p-groupe" name="groupe">
+              <option value="GB1">GB1</option>
+              <option value="GB2">GB2</option>
+              <option value="LK1">LK1</option>
+              <option value="LK2">LK2</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </form>
+
+      <div class="divider"></div>
+      <div class="section-label">Domicile principal</div>
+      <form id="form-domicile">
+        <div class="form-group">
+          <label>Adresse</label>
+          <input type="text" id="p-adresse" name="adresse" placeholder="12 rue des Lilas">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ville</label>
+            <input type="text" id="p-ville" name="ville">
+          </div>
+          <div class="form-group">
+            <label>Code postal</label>
+            <input type="text" id="p-cp" name="code_postal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Type de domicile</label>
+          <select id="p-domicile-type" name="domicile_type">
+            <option value="principale">Principal</option>
+            <option value="secondaire">Secondaire</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer le domicile</button>
+      </form>
+
+      <div class="divider"></div>
+      <div class="section-label">Changer de mot de passe</div>
+      <form id="form-mdp">
+        <div class="form-group">
+          <label>Nouveau mot de passe</label>
+          <input type="password" name="new_mdp" required>
+        </div>
+        <div class="form-group">
+          <label>Confirmer le mot de passe</label>
+          <input type="password" name="confirm_mdp" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
+      </form>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- MODAL MODIFICATION VÉHICULE -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h3>Modifier le véhicule</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Marque</label><input type="text" id="modal-marque"></div>
+      <div class="form-group"><label>Modèle</label><input type="text" id="modal-modele"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Immatriculation</label><input type="text" id="modal-immat"></div>
+      <div class="form-group"><label>Nb de places</label><input type="number" id="modal-places" min="2" max="9"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>CT (validité)</label><input type="date" id="modal-ct"></div>
+      <div class="form-group"><label>Assurance (échéance)</label><input type="date" id="modal-assurance"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn" id="modal-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PANNEAU ADMIN
+════════════════════════════════════════════════════════ -->
+<div id="admin-screen" style="display:none;min-height:100vh;background:var(--bg);">
+
+  <!-- Header admin -->
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:6px;background:#1a1917;display:flex;align-items:center;justify-content:center;font-size:16px;">⚙️</div>
+      <div>
+        <div style="font-size:14px;font-weight:500;">Panneau d'administration</div>
+        <div style="font-size:11px;color:var(--text-3);">Gestion de la base de données FCSM</div>
+      </div>
+    </div>
+    <button id="admin-logout-btn" style="font-size:12.5px;padding:7px 14px;border-radius:6px;border:1px solid var(--border-strong);background:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-2);">
+      Déconnexion
+    </button>
+  </div>
+
+  <div style="display:flex;min-height:calc(100vh - 57px);">
+
+    <!-- Sidebar tables -->
+    <div id="admin-sidebar" style="width:190px;min-width:190px;background:var(--surface);border-right:1px solid var(--border);padding:16px 10px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);padding:0 8px 8px;font-weight:500;">Tables</div>
+      <div id="admin-table-list"></div>
+    </div>
+
+    <!-- Contenu -->
+    <div style="flex:1;padding:28px 32px;overflow:auto;">
+      <div id="admin-content">
+        <div class="empty-state" style="margin-top:60px;">
+          <div style="font-size:32px;margin-bottom:12px;">🗄️</div>
+          <p>Sélectionne une table dans la sidebar pour la consulter et la modifier.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

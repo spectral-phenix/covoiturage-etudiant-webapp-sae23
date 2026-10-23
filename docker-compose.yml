@@ -1,0 +1,33 @@
+# Lance l'application complète : docker compose up -d  →  http://localhost:8080
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: change-moi
+      MYSQL_DATABASE: FCSM
+      MYSQL_USER: fcsm
+      MYSQL_PASSWORD: fcsm
+    volumes:
+      # exécuté automatiquement au premier démarrage : structure + données de démonstration
+      - ./database/fcsm.sql:/docker-entrypoint-initdb.d/fcsm.sql:ro
+      - donnees:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 20
+
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: FCSM
+      DB_USER: fcsm
+      DB_PASS: fcsm
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  donnees:

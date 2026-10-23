@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration — FCSM Covoiturage</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    #admin-app { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    #admin-sidebar {
+      width: 220px; min-width: 220px;
+      background: #111;
+      color: #ccc;
+      display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh;
+    }
+    #admin-sidebar-top {
+      padding: 22px 18px 16px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    #admin-badge {
+      display: inline-block; font-size: 10px; padding: 2px 9px;
+      background: #c00; color: #fff; border-radius: 4px;
+      font-weight: 700; letter-spacing: 0.08em; margin-bottom: 10px;
+    }
+    #admin-title { font-size: 15px; font-weight: 500; color: #eee; }
+    #admin-sub   { font-size: 12px; color: #555; margin-top: 3px; }
+
+    #admin-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .admin-nav-section {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #444;
+      padding: 10px 8px 4px; font-weight: 600;
+    }
+    .admin-nav-item {
+      padding: 8px 10px; border-radius: 6px;
+      font-size: 13px; color: #888; cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .admin-nav-item:hover { background: #1e1e1e; color: #ddd; }
+    .admin-nav-item.active { background: #222; color: #fff; font-weight: 500; }
+
+    #admin-logout {
+      margin: 10px; padding: 9px 12px; border-radius: 6px;
+      font-size: 13px; color: #555; cursor: pointer;
+      border: 1px solid #2a2a2a; background: none;
+      font-family: 'DM Sans', sans-serif; text-align: left;
+      transition: background 0.12s; display: flex; align-items: center; gap: 8px;
+    }
+    #admin-logout:hover { background: #1e1e1e; color: #999; }
+
+    /* ── Content ── */
+    #admin-content { flex: 1; padding: 36px 40px; max-width: 1080px; overflow-x: auto; }
+    .admin-page { display: none; }
+    .admin-page.active { display: block; animation: fadeIn 0.15s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 18px 20px;
+    }
+    .stat-num { font-size: 30px; font-weight: 500; color: var(--text); }
+    .stat-label { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+
+    /* ── Top bar ── */
+    .top-bar {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 6px;
+    }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); }
+    thead th {
+      text-align: left; padding: 9px 12px;
+      background: var(--surface2); border-bottom: 1px solid var(--border);
+      font-weight: 500; color: var(--text-2); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    tbody td {
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      color: var(--text); vertical-align: middle;
+      max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr:last-child td { border-bottom: none; }
+    .null-val { color: var(--text-3); font-style: italic; }
+
+    /* ── Action buttons ── */
+    .action-btns { display: flex; gap: 5px; }
+
+    /* ── Modal ── */
+    #admin-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    #admin-modal-overlay.show { display: flex; }
+    #admin-modal {
+      background: var(--surface); border-radius: var(--radius-lg);
+      padding: 28px; width: 580px; max-width: 95vw;
+      border: 1px solid var(--border); max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,.18);
+    }
+    #admin-modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 20px; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1a1917; color: #fff;
+      font-size: 13px; padding: 10px 18px;
+      border-radius: var(--radius); opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Loading ── */
+    .loading { text-align:center; padding:32px; color:var(--text-3); font-size:13px; }
+  </style>
+</head>
+<body>
+
+<div id="admin-app">
+
+  <!-- ════════════════ SIDEBAR ════════════════ -->
+  <div id="admin-sidebar">
+    <div id="admin-sidebar-top">
+      <div id="admin-badge">ADMIN</div>
+      <div id="admin-title">Panel admin</div>
+      <div id="admin-sub">FCSM Covoiturage</div>
+    </div>
+    <nav id="admin-nav">
+      <div class="admin-nav-section">Vue globale</div>
+      <div class="admin-nav-item active" data-panel="dashboard">
+        📊 Tableau de bord
+      </div>
+
+      <div class="admin-nav-section">Tables</div>
+      <div class="admin-nav-item" data-panel="etudiants">👤 Étudiants</div>
+      <div class="admin-nav-item" data-panel="vehicules">🚗 Véhicules</div>
+      <div class="admin-nav-item" data-panel="lieux">📍 Lieux</div>
+      <div class="admin-nav-item" data-panel="trajets">🛣️ Trajets</div>
+      <div class="admin-nav-item" data-panel="horaires">📅 Horaires</div>
+      <div class="admin-nav-item" data-panel="domiciles">🏠 Domiciles</div>
+      <div class="admin-nav-item" data-panel="equipages">👥 Équipages</div>
+    </nav>
+    <button id="admin-logout">🚪 Déconnexion</button>
+  </div>
+
+  <!-- ════════════════ CONTENT ════════════════ -->
+  <div id="admin-content">
+
+    <!-- DASHBOARD -->
+    <div class="admin-page active" id="panel-dashboard">
+      <h2>Tableau de bord</h2>
+      <p class="page-sub">Vue d'ensemble de la base de données</p>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="stat-etudiants">—</div><div class="stat-label">Étudiants</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-vehicules">—</div><div class="stat-label">Véhicules</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-trajets">—</div><div class="stat-label">Trajets</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-lieux">—</div><div class="stat-label">Lieux</div></div>
+      </div>
+      <p class="page-sub">Sélectionne une table dans la sidebar pour la consulter et la modifier.</p>
+    </div>
+
+    <!-- ÉTUDIANTS -->
+    <div class="admin-page" id="panel-etudiants">
+      <div class="top-bar">
+        <div><h2>Étudiants</h2><p class="page-sub">Gestion des comptes étudiants</p></div>
+        <button class="btn btn-primary" onclick="openModal('etudiant')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap"><table id="table-etudiants">
+        <thead><tr><th>ID</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Mot de passe</th><th>Groupe</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="7" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- VÉHICULES -->
+    <div class="admin-page" id="panel-vehicules">
+      <div class="top-bar">
+        <div><h2>Véhicules</h2><p class="page-sub">Gestion des véhicules enregistrés</p></div>
+        <button class="btn btn-primary" onclick="openModal('vehicule')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap"><table id="table-vehicules">
+        <thead><tr><th>ID</th><th>Marque</th><th>Modèle</th><th>Immatriculation</th><th>Places</th><th>Étudiant (id)</th><th>CT</th><th>Assurance</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="9" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- LIEUX -->
+    <div class="admin-page" id="panel-lieux">
+      <div class="top-bar">
+        <div><h2>Lieux</h2><p class="page-sub">Tous les lieux enregistrés</p></div>
+        <button class="btn btn-primary" onclick="openModal('lieu')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap"><table id="table-lieux">
+        <thead><tr><th>ID</th><th>Nom</th><th>Adresse</th><th>Ville</th><th>Type</th><th>CP</th><th>Latitude</th><th>Longitude</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="9" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- TRAJETS -->
+    <div class="admin-page" id="panel-trajets">
+      <div class="top-bar">
+        <div><h2>Trajets</h2><p class="page-sub">Tous les trajets créés</p></div>
+      </div>
+      <div class="table-wrap"><table id="table-trajets">
+        <thead><tr><th>ID</th><th>Date</th><th>H. départ</th><th>H. arrivée</th><th>H. retour dep.</th><th>H. retour arr.</th><th>Type</th><th>Plein</th><th>Créateur</th><th>Départ</th><th>Arrivée</th><th>Véhicule</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="13" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- HORAIRES -->
+    <div class="admin-page" id="panel-horaires">
+      <div class="top-bar">
+        <div><h2>Horaires</h2><p class="page-sub">Horaires universitaires et loisirs</p></div>
+        <button class="btn btn-primary" onclick="openModal('horaire')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap"><table id="table-horaires">
+        <thead><tr><th>ID</th><th>Étudiant (id)</th><th>Jour</th><th>Début</th><th>Fin</th><th>Lieu (id)</th><th>Type</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="8" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- DOMICILES -->
+    <div class="admin-page" id="panel-domiciles">
+      <div class="top-bar">
+        <div><h2>Domiciles</h2><p class="page-sub">Liaisons étudiant ↔ lieu de domicile</p></div>
+        <button class="btn btn-primary" onclick="openModal('domicile')">+ Ajouter</button>
+      </div>
+      <div class="table-wrap"><table id="table-domiciles">
+        <thead><tr><th>ID</th><th>Type</th><th>Étudiant (id)</th><th>Lieu (id)</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="5" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- ÉQUIPAGES -->
+    <div class="admin-page" id="panel-equipages">
+      <div class="top-bar">
+        <div><h2>Équipages</h2><p class="page-sub">Membres par trajet</p></div>
+      </div>
+      <div class="table-wrap"><table id="table-equipages">
+        <thead><tr><th>ID</th><th>Trajet (id)</th><th>Étudiant (id)</th><th>Rôle</th><th>Valide aller</th><th>Valide retour</th><th>Actions</th></tr></thead>
+        <tbody><tr><td colspan="7" class="loading">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /admin-app -->
+
+<!-- ════════════════ MODAL ════════════════ -->
+<div id="admin-modal-overlay">
+  <div id="admin-modal">
+    <h3 id="modal-title">Ajouter</h3>
+    <div id="modal-fields"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+      <button class="btn" id="modal-cancel-btn">Annuler</button>
+      <button class="btn btn-primary" id="modal-save-btn">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'api/admin.php';
+
+// ── Vérif session admin au chargement ──────────────────────────────────────
+(async () => {
+  const res  = await fetch('api/auth.php?action=me');
+  const data = await res.json();
+  if (!data.connected || !data.is_admin) {
+    window.location.href = 'index.html';
+    return;
+  }
+  loadStats();
+})();
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.admin-nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    const panel = item.dataset.panel;
+    document.getElementById('panel-' + panel).classList.add('active');
+    loadPanel(panel);
+  });
+});
+
+// ── Logout ─────────────────────────────────────────────────────────────────
+document.getElementById('admin-logout').addEventListener('click', async () => {
+  await fetch('api/auth.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'logout' })
+  });
+  window.location.href = 'index.html';
+});
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg, err = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? '#8a1a1a' : '#1a1917';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── API helper ─────────────────────────────────────────────────────────────
+async function api(params, method = 'GET', body = null) {
+  const url = API + '?' + new URLSearchParams(params);
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  return r.json();
+}
+
+// ── Panel → table SQL name mapping ────────────────────────────────────────
+const PANEL_TO_TABLE = {
+  etudiants:  'etudiant',
+  vehicules:  'vehicule',
+  lieux:      'lieu',
+  trajets:    'trajet',
+  horaires:   'horaire',
+  domiciles:  'domicile',
+  equipages:  'membre_equipage'
+};
+
+// ── Charger un panel ───────────────────────────────────────────────────────
+async function loadPanel(panel) {
+  if (panel === 'dashboard') { loadStats(); return; }
+  const tableName = PANEL_TO_TABLE[panel];
+  if (!tableName) return;
+  const tbody = document.querySelector('#table-' + panel + ' tbody');
+  tbody.innerHTML = '<tr><td colspan="20" class="loading">Chargement...</td></tr>';
+  const data = await api({ table: tableName });
+  renderTable(panel, Array.isArray(data) ? data : []);
+}
+
+// ── Rendu tableau ──────────────────────────────────────────────────────────
+const PANEL_COLS = {
+  etudiants:  ['id','nom','prenom','email','password','groupe'],
+  vehicules:  ['id','marque','modele','immatriculation','nb_places','id_etudiant','date_ct','date_assurance'],
+  lieux:      ['id','nom','adresse','ville','type','code_postal','latitude','longitude'],
+  trajets:    ['id','date_trajet','heure_depart','heure_arrivee_estimee','heure_retour_depart','heure_retour_arrivee','type','estPlein','id_createur','id_lieu_depart','id_lieu_arrivee','id_vehicule'],
+  horaires:   ['id','id_etudiant','jour_semaine','heure_debut','heure_fin','id_lieu','type'],
+  domiciles:  ['id','type','id_etudiant','id_lieu'],
+  equipages:  ['id','id_trajet','id_etudiant','role','valide_aller','valide_retour']
+};
+
+function renderTable(panel, rows) {
+  const tableName = PANEL_TO_TABLE[panel];
+  const tbody     = document.querySelector('#table-' + panel + ' tbody');
+  const cols      = PANEL_COLS[panel] || [];
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="${cols.length + 1}" style="text-align:center;padding:24px;color:var(--text-3);">Aucune donnée dans cette table.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const cells = cols.map(c => {
+      const val = r[c];
+      if (val === null || val === undefined || val === '') return `<td><span class="null-val">—</span></td>`;
+      if (c === 'estPlein' || c === 'valide_aller' || c === 'valide_retour')
+        return `<td><span class="badge ${val ? 'badge-green' : 'badge-gray'}">${val ? 'Oui' : 'Non'}</span></td>`;
+      if (c === 'role')
+        return `<td><span class="badge ${val === 'conducteur' ? 'badge-blue' : 'badge-gray'}">${val}</span></td>`;
+      return `<td title="${String(val).replace(/"/g,'&quot;')}">${val}</td>`;
+    }).join('');
+
+    const actions = `<td><div class="action-btns">
+      <button class="btn" style="font-size:11.5px;padding:4px 10px;" onclick='openEditModal("${panel}", ${JSON.stringify(r).replace(/'/g,"&#39;")})'>✏️ Modifier</button>
+      <button class="btn btn-danger" style="font-size:11.5px;padding:4px 10px;" onclick="deleteRow('${panel}', ${r.id})">🗑</button>
+    </div></td>`;
+
+    return `<tr>${cells}${actions}</tr>`;
+  }).join('');
+}
+
+// ── Stats dashboard ────────────────────────────────────────────────────────
+async function loadStats() {
+  const tasks = [
+    ['etudiant', 'stat-etudiants'],
+    ['vehicule',  'stat-vehicules'],
+    ['trajet',    'stat-trajets'],
+    ['lieu',      'stat-lieux']
+  ];
+  await Promise.all(tasks.map(async ([table, elId]) => {
+    const data = await api({ table });
+    document.getElementById(elId).textContent = Array.isArray(data) ? data.length : '?';
+  }));
+}
+
+// ── Supprimer une ligne ────────────────────────────────────────────────────
+async function deleteRow(panel, id) {
+  if (!confirm(`Supprimer l'entrée id=${id} de la table "${PANEL_TO_TABLE[panel]}" ?\nCette action est irréversible.`)) return;
+  const r = await api({ table: PANEL_TO_TABLE[panel], id }, 'DELETE');
+  if (r.success) { toast('Entrée supprimée.'); loadPanel(panel); }
+  else toast(r.error || 'Erreur lors de la suppression', true);
+}
+
+// ── Définition des champs par table ───────────────────────────────────────
+const FIELD_DEFS = {
+  etudiant: [
+    { name:'nom',     label:'Nom',          type:'text',   required:true },
+    { name:'prenom',  label:'Prénom',        type:'text',   required:true },
+    { name:'email',   label:'Email',         type:'text',   required:true },
+    { name:'password',label:'Mot de passe',  type:'text',   required:true },
+    { name:'groupe',  label:'Groupe',        type:'select', required:true, options:['GB1','GB2','LK1','LK2'] }
+  ],
+  vehicule: [
+    { name:'marque',         label:'Marque',            type:'text' },
+    { name:'modele',         label:'Modèle',            type:'text' },
+    { name:'immatriculation',label:'Immatriculation',   type:'text',   required:true },
+    { name:'nb_places',      label:'Nb places',         type:'number', required:true },
+    { name:'id_etudiant',    label:'ID Étudiant',       type:'number', required:true },
+    { name:'date_ct',        label:'CT (validité)',      type:'date' },
+    { name:'date_assurance', label:'Assurance (échéance)',type:'date' }
+  ],
+  lieu: [
+    { name:'nom',         label:'Nom',         type:'text',   required:true },
+    { name:'adresse',     label:'Adresse',     type:'text' },
+    { name:'ville',       label:'Ville',       type:'text' },
+    { name:'type',        label:'Type',        type:'select', required:true, options:['universite','loisir','courses','domicile'] },
+    { name:'code_postal', label:'Code postal', type:'text' },
+    { name:'latitude',    label:'Latitude',    type:'text' },
+    { name:'longitude',   label:'Longitude',   type:'text' }
+  ],
+  horaire: [
+    { name:'id_etudiant',  label:'ID Étudiant', type:'number', required:true },
+    { name:'id_lieu',      label:'ID Lieu',     type:'number', required:true },
+    { name:'jour_semaine', label:'Jour',        type:'select', required:true, options:['lundi','mardi','mercredi','jeudi','vendredi','samedi'] },
+    { name:'heure_debut',  label:'Heure début', type:'time',   required:true },
+    { name:'heure_fin',    label:'Heure fin',   type:'time',   required:true },
+    { name:'type',         label:'Type',        type:'select', options:['travail','loisir','courses'] }
+  ],
+  domicile: [
+    { name:'type',        label:'Type',            type:'select', required:true, options:['principale','secondaire'] },
+    { name:'id_etudiant', label:'ID Étudiant',     type:'number', required:true },
+    { name:'id_lieu',     label:'ID Lieu domicile',type:'number', required:true }
+  ]
+};
+
+// ── Modal — ouvrir (ajout) ─────────────────────────────────────────────────
+let currentPanel   = null;
+let currentEditId  = null;
+
+function openModal(tableName) {
+  currentPanel  = tableName;
+  currentEditId = null;
+  document.getElementById('modal-title').textContent = '➕ Ajouter — ' + tableName;
+  renderModalFields(tableName, {});
+  document.getElementById('admin-modal-overlay').classList.add('show');
+}
+
+// ── Modal — ouvrir (modification) ─────────────────────────────────────────
+function openEditModal(panel, data) {
+  currentPanel  = PANEL_TO_TABLE[panel] || panel;
+  currentEditId = data.id;
+  document.getElementById('modal-title').textContent = `✏️ Modifier — ${currentPanel} #${data.id}`;
+  renderModalFields(currentPanel, data);
+  document.getElementById('admin-modal-overlay').classList.add('show');
+}
+
+// ── Modal — rendu des champs ───────────────────────────────────────────────
+function renderModalFields(tableName, data) {
+  const fields = FIELD_DEFS[tableName];
+  if (!fields) {
+    document.getElementById('modal-fields').innerHTML =
+      `<p style="color:var(--text-2);font-size:13px;">Modification manuelle non disponible pour la table <strong>${tableName}</strong>.<br>Utilise les boutons Supprimer / phpMyAdmin pour cette table.</p>`;
+    return;
+  }
+
+  // 2 colonnes si beaucoup de champs
+  const grid = fields.length > 4 ? 'grid-template-columns:1fr 1fr;' : 'grid-template-columns:1fr;';
+
+  document.getElementById('modal-fields').innerHTML = `<div style="display:grid;${grid}gap:0 16px;">` +
+    fields.map(f => {
+      const val = data[f.name] ?? '';
+      let input;
+      if (f.type === 'select') {
+        const opts = (f.options || []).map(o =>
+          `<option value="${o}" ${String(o) === String(val) ? 'selected' : ''}>${o}</option>`
+        ).join('');
+        input = `<select id="mf-${f.name}">${opts}</select>`;
+      } else {
+        input = `<input type="${f.type}" id="mf-${f.name}" value="${String(val).replace(/"/g,'&quot;')}" ${f.required ? 'required' : ''}>`;
+      }
+      return `<div class="form-group"><label>${f.label}${f.required ? ' <span style="color:#c00">*</span>' : ''}</label>${input}</div>`;
+    }).join('') + '</div>';
+}
+
+// ── Modal — fermer ────────────────────────────────────────────────────────
+document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+  document.getElementById('admin-modal-overlay').classList.remove('show');
+});
+
+// Fermer en cliquant dehors
+document.getElementById('admin-modal-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget)
+    document.getElementById('admin-modal-overlay').classList.remove('show');
+});
+
+// ── Modal — sauvegarder ───────────────────────────────────────────────────
+document.getElementById('modal-save-btn').addEventListener('click', async () => {
+  const fields = FIELD_DEFS[currentPanel];
+  if (!fields) { document.getElementById('admin-modal-overlay').classList.remove('show'); return; }
+
+  const body = { table: currentPanel };
+  for (const f of fields) {
+    const el = document.getElementById('mf-' + f.name);
+    body[f.name] = el ? (el.value || null) : null;
+  }
+
+  let r;
+  if (currentEditId) {
+    body.id = currentEditId;
+    r = await api({ table: currentPanel }, 'PUT', body);
+  } else {
+    r = await api({ table: currentPanel }, 'POST', body);
+  }
+
+  if (r.success || r.id) {
+    toast(currentEditId ? 'Modifié avec succès !' : 'Entrée ajoutée !');
+    document.getElementById('admin-modal-overlay').classList.remove('show');
+    // Recharger le panel courant
+    const reverseMap = Object.fromEntries(Object.entries(PANEL_TO_TABLE).map(([k,v]) => [v,k]));
+    const panel = reverseMap[currentPanel] || currentPanel;
+    loadPanel(panel);
+  } else {
+    toast(r.error || 'Erreur lors de la sauvegarde', true);
+  }
+});
+</script>
+</body>
+</html>
