@@ -203,7 +203,7 @@ Détail de chaque endpoint dans le [guide du développeur](docs/guide-developpeu
 ### Option 1 : Docker (le plus simple)
 
 ```bash
-git clone https://github.com/spectral-phenix/<nom-du-depot>.git
+git clone https://github.com/spectral-phenix/covoiturage-etudiant-webapp-sae23.git
 cd <nom-du-depot>
 docker compose up -d
 ```
